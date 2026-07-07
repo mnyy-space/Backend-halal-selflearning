@@ -1,0 +1,28 @@
+# Logs and databases
+*.log
+*.sqlite
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environments and secrets
+.env
+.env.local
+
+# Dependencies (uncomment your specific environment)
+node_modules/
+# venv/
+# .venv/
+# env/
+
+# Build directories
+dist/
+build/
+out/
+
+# IDE and Editor configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
