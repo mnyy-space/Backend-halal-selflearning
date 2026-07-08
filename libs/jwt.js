@@ -11,16 +11,15 @@ module.exports = {
     },
 
     verify(token){
-        return new promise(()=>{
+        return new Promise((resolve, reject)=>{
             jwt.verify(token, sercretKey, (err, decoded)=>{
-            if(err){
-                reject(err);
-            }
-            else{
-                resolve(decoded);
-            }
-            }
-        )
+                if(err){
+                    reject(err);
+                }
+                else{
+                    resolve(decoded);
+                }
+            })
         })
     }
 }

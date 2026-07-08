@@ -7,10 +7,24 @@ Content-Type: application/json
 }
 
 ####
-POST http://localhost:3000/request/request_token HTTP/1.1
+POST http://localhost:3000/authen/authen_request HTTP/1.1
 Content-Type: application/json
 
 {
-    "name" : "afdol",
-    "password" : "676767"
+    "authenRequest" : "faf3155b245c8bd39d946f4423f889ed213ba547afbe8fd5b9dd1f9e6e72e0f5"
+}
+
+####
+# After calling /authen/authen_request, copy the token from response.data.
+# Then generate authenSignature in MySQL/MariaDB:
+# SELECT SHA2(CONCAT(username, '&', password, '&', 'PASTE_AUTHEN_TOKEN_HERE'), 256) AS authenSignature
+# FROM user_accounts
+# WHERE username = 'afdol';
+
+POST http://localhost:3000/authen/access_request HTTP/1.1
+Content-Type: application/json
+
+{
+    "authenToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFmZG9sIiwiaWF0IjoxNzgzNDc5NzMwLCJleHAiOjE3ODM1NjYxMzB9.EZbZnlT9bPczwxf4byzx-wTnXC-JhAAOwFMlPXSTNkk",
+    "authenSignature" : "f57c209f9b16aa88cc20bcc712d979f77cf9d4ba0d289db33be589dfbc4c2e18"
 }

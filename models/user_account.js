@@ -1,32 +1,21 @@
-const pool = require('./libs/dp_pool')
-const dateUtils = require('./libs/data_utils')
+const pool = require('../libs/dp_pool')
+const dateUtils = require('../libs/data_utils')
 
 const userTable = ''
-modile.export = {
-    getUserAccountById(id){
+module.exports = {
+    getUserByName: async () =>{
         let connect;
         let result;
-
+        var response;
         try{
             connect = await pool.getConnection();
-
-            //sql needed
-            var sql = "SELECT "
-
-            var record = connect.query(sql);
-            return {
-                isError : false,
-                data : record
-            }
+            var sql = "SELECT user_id, username, role_name FROM user_accounts uc ,  WHERE username = ?"
         }
         catch(error){
 
         }
         finally{
-            if(connect){
-                connect.release();
-            }
-            return result;
+
         }
     },
 
@@ -42,7 +31,7 @@ modile.export = {
             var sql = "SELECT username FROM user_accounts WHERE "
             + "SHA2(CONCAT(username, '&', ?), 256) = ?"
 
-            var result = await connect.query(sql,[getCurrentDataForToken(), authenRequest]);
+            result = await connect.query(sql,[dateUtils.getCurrentDateForToken(), authenRequest]);
             if(result.length == 0){
                 response = {
                     isError : true,
@@ -71,18 +60,17 @@ modile.export = {
     },
 
     //access Authen
-    checkAuthenAcess: async (authenToken, authenAccess) =>{
+    checkAuthenAccess: async (authenToken, authenSignature) =>{
         let connect;
         let result;
         var response;
         try{
             connect = await pool.getConnection();
-
             // sql needed
-            var sql = "SELECT username FROM user_accounts WHERE "
+            var sql = "SELECT user_id, username FROM user_accounts WHERE "
             + "SHA2(CONCAT(username,'&',password, '&', ?), 256) = ?"
 
-            var result = await connect.query(sql,[authenToken, authenAccess]);
+            result = await connect.query(sql,[authenToken, authenSignature]);
             if(result.length == 0){
                 response = {
                     isError : true,
@@ -108,7 +96,31 @@ modile.export = {
             }
             return response;
         }
-    }
+    },
 
+    checkAuthenAcess: async (authenToken, authenSignature) =>{
+        return module.exports.checkAuthenAccess(authenToken, authenSignature);
+    },
+
+    //register path
+
+    register: async (registerDTO)=>{
+        let connect;
+        let result;
+        var response;
+
+        try{
+            connect = await pool.getConnection();
+            var sql = "INSERT INTO user_accounts(username, `password`) VALUES ( ? , ?)"
+            result = await connect.query(sql,[registerDTO.username, registerDTO.password]);
+
+        }
+        catch(error){
+
+        }
+        finally{
+
+        }
+    }
 
 }
