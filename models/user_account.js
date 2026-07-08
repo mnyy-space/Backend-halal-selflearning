@@ -67,8 +67,10 @@ module.exports = {
         try{
             connect = await pool.getConnection();
             // sql needed
-            var sql = "SELECT user_id, username FROM user_accounts WHERE "
-            + "SHA2(CONCAT(username,'&',password, '&', ?), 256) = ?"
+            var sql = "SELECT uc.user_id, uc.username, ur.role_name "
+            + "FROM user_accounts uc "
+            + "JOIN user_role ur ON uc.role_id = ur.role_id "
+            + "WHERE SHA2(CONCAT(uc.username, '&', uc.password, '&', ?), 256) = ?"
 
             result = await connect.query(sql,[authenToken, authenSignature]);
             if(result.length == 0){

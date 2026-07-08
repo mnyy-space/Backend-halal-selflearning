@@ -56,15 +56,22 @@ const handleAccessRequest = async (req, res) => {
         }
     }
     else{
+            const user_id = result.data[0].user_id
+            const username = result.data[0].username
+            const role_name = result.data[0].role_name
         var payload = {
-            user_id : result.data[0].user_id,
-            username : result.data[0].username,
+            user_id,
+            username,
         }
 
         const accessToken = jwt.sign(payload);
         response = {
             isError : false,
-            data : accessToken,
+            data : {
+              user_id,
+              username,
+              role_name,
+              accessToken},
             errorMessage: ""
         }
     }
