@@ -3,7 +3,7 @@ const jwt = require("../libs/jwt");
 const userAccountModel = require("../models/user_account");
 
 const handleAuthenRequest = async (req, res) => {
-  const authenRequest = req.body.authenRequest;
+  const authenRequest = req.body.authen_request;
   const auth_grant = await userAccountModel.checkAuthenRequest(authenRequest);
 
   var response;
@@ -30,8 +30,8 @@ const handleAuthenRequest = async (req, res) => {
 
 const handleAccessRequest = async (req, res) => {
   //access request DTO hashed{request token, password}
-  const authenSignature = req.body.authenSignature;
-  const authenToken = req.body.authenToken;
+  const authenSignature = req.body.authen_signature;
+  const authenToken = req.body.authen_token;
   var response;
   var decode;
 
