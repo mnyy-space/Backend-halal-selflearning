@@ -2,7 +2,7 @@
 //scubaaaaaaaaaaaaaaaaaaaaaaaaa
 
 const port = 3000;
-const host = "127.0.0.1";
+const host = "localhost";
 
 const express = require("express");
 const bodyParser = require("body-parser");
