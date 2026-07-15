@@ -8,13 +8,15 @@ const getExerciseBysessionId = async (req, res) => {
     if(result.isError){
         res.json({
             isError : true,
-            errorMessage : result.errorMessage
+            errorMessage : result.errorMessage,
+            data:""
         })
     }
     else{
         res.json({
             isError : false,
-            data : result.data
+            data : result.data,
+            errorMessage:""
         })
     }  
 }
