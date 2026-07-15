@@ -83,6 +83,7 @@ const handleAccessRequest = async (req, res) => {
       errorMessage: "ข้อมูลไม่ถูกต้อง"
     }
   }
+  console.log(response)
   res.send(JSON.stringify(response))
 };
 

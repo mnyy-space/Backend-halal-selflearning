@@ -115,13 +115,28 @@ module.exports = {
             connect = await pool.getConnection();
             var sql = "INSERT INTO user_accounts(username, `password`) VALUES ( ? , ?)"
             result = await connect.query(sql,[registerDTO.username, registerDTO.password]);
-
+            if(result.length == 0){
+                response = {
+                    isError : true,
+                    errorMessage : "data is not found"
+                }
+            }
+            else{
+                response= {
+                    isError: false,
+                    data : result
+                }
+            }
         }
         catch(error){
-
-        }
+            response = {
+                isError: true,
+                errorMessage: error.message
+            }
+        }   
         finally{
-
+            connect.release()
+            return response;
         }
     }
 

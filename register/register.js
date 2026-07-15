@@ -1,11 +1,8 @@
-const express = require('express');
 const hash = require('../libs/hash');
-const app = express();
 const userAccountModel = require('../models/user_account');
 
 
-register: ()=>{
-    app.post('/register', async (req, res) => {
+const handleRegister = async(req, res)=>{
         const username = req.body.username;
         const password = req.body.password;
         var response;
@@ -28,12 +25,11 @@ register: ()=>{
             
             response = {
                 isError : false,
-                errorMessage : ""
+                errorMessage : "",
+                data:result
             }
         }
-
-
-    })
+        res.json(response);
 }
 
-module.exports = register;
+module.exports = handleRegister;

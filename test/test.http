@@ -11,7 +11,7 @@ POST http://localhost:3000/authen/authen_request HTTP/1.1
 Content-Type: application/json
 
 {
-    "authenRequest" : "faf3155b245c8bd39d946f4423f889ed213ba547afbe8fd5b9dd1f9e6e72e0f5"
+    "authen_request" : "b044ebc9f588cdf2e185311adbb79d037222adc9d9685db596c4b68055c4911f"
 }
 
 ####
@@ -25,6 +25,19 @@ POST http://localhost:3000/authen/access_request HTTP/1.1
 Content-Type: application/json
 
 {
-    "authenToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFmZG9sIiwiaWF0IjoxNzgzNDc5NzMwLCJleHAiOjE3ODM1NjYxMzB9.EZbZnlT9bPczwxf4byzx-wTnXC-JhAAOwFMlPXSTNkk",
-    "authenSignature" : "f57c209f9b16aa88cc20bcc712d979f77cf9d4ba0d289db33be589dfbc4c2e18"
+    "authen_token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFmZG9sIiwiaWF0IjoxNzg0MDk2MDg1LCJleHAiOjE3ODQxODI0ODV9.0rBQImccla6cJI_tWlXMpZL_jXeaW04tZeF0iB3BnnM",
+    "authen_signature" : "4ff8d387f465619e69875e65f94e2a873f5bbf609538638e56f0e13bcfabf2c6"
 }
+### 
+GET http://localhost:3000/skill HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImFmZG9sIiwiaWF0IjoxNzg0MDk2MTIxLCJleHAiOjE3ODQxODI1MjF9.Ky5e1vvde8esJD1SaaBzF9lJpSeUz_uY3S2b_lRH_Ys
+
+### 
+GET http://localhost:3000/session/1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImFmZG9sIiwiaWF0IjoxNzg0MDk2MTIxLCJleHAiOjE3ODQxODI1MjF9.Ky5e1vvde8esJD1SaaBzF9lJpSeUz_uY3S2b_lRH_Ys
+### 
+GET http://localhost:3000/exercise/1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImFmZG9sIiwiaWF0IjoxNzg0MDk2MTIxLCJleHAiOjE3ODQxODI1MjF9.Ky5e1vvde8esJD1SaaBzF9lJpSeUz_uY3S2b_lRH_Ys
