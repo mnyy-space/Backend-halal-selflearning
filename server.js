@@ -14,6 +14,7 @@ const handleRegister = require('./register/register')
 const showSkill = require('./skills/skill')
 const handleGetSession = require('./session/session')
 const getExerciseBysessionId = require('./exercise/exercise')
+const { handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus } = require('./admin/exercise/exercise')
 
 app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,6 +28,11 @@ app.post("/register", handleRegister)
 app.get("/skill", authMiddleware, showSkill)
 app.get("/session/:skill_id", authMiddleware, handleGetSession)
 app.get("/exercise/:session_id", authMiddleware, getExerciseBysessionId)
+
+// Admin exercise endpoints
+app.post("/admin/exercise", authMiddleware, handleCreateExercise);
+app.put("/admin/exercise/:exercise_id", authMiddleware, handleUpdateExercise);
+app.patch("/admin/exercise/:exercise_id/status", authMiddleware, handleChangeExerciseStatus);
 
 app.listen(port, () => {
   console.log(`app listening on http://${host}:${port}`);
