@@ -2,24 +2,26 @@ const assert = require('assert');
 const exerciseAdminModel = require('../models/exercise_admin');
 
 async function runUnitTests() {
-    console.log('--- Running Exercise Admin Unit Tests ---');
+    console.log('--- Running Exercise Admin Unit Tests (with Skill Many-to-One Binding) ---');
     try {
-        // 1. Test createExercise
-        const createRes = await exerciseAdminModel.createExercise(1, 'UnitTest Exercise Script', [
+        // 1. Test createExercise with skill_id = 1
+        const createRes = await exerciseAdminModel.createExercise(1, 'UnitTest Exercise Script Many-to-One Skill', [
             { choice_script: 'Choice 1 (Correct)', isAnswer: 1 },
             { choice_script: 'Choice 2 (Incorrect)', isAnswer: 0 }
-        ]);
+        ], 1);
         assert.strictEqual(createRes.isError, false, `createExercise should not return error: ${createRes.errorMessage}`);
         assert.ok(createRes.data.exercise_id, 'exercise_id should be returned');
+        assert.strictEqual(createRes.data.skill_id, 1, 'skill_id should be 1');
         const testExId = createRes.data.exercise_id;
-        console.log('✓ Test createExercise passed. Created ID:', testExId);
+        console.log('✓ Test createExercise (with skill_id=1) passed. Created ID:', testExId);
 
-        // 2. Test updateExercise
+        // 2. Test updateExercise with skill_id = 2
         const updateRes = await exerciseAdminModel.updateExercise(testExId, 'UnitTest Exercise Script Updated', [
             { choice_script: 'Choice 1 Updated', isAnswer: 1 }
-        ]);
+        ], 2);
         assert.strictEqual(updateRes.isError, false, `updateExercise should not return error: ${updateRes.errorMessage}`);
-        console.log('✓ Test updateExercise passed.');
+        assert.strictEqual(updateRes.data.skill_id, 2, 'skill_id should be updated to 2');
+        console.log('✓ Test updateExercise (with skill_id=2) passed.');
 
         // 3. Test changeExerciseStatus to 0 (Inactive)
         const statusRes0 = await exerciseAdminModel.changeExerciseStatus(testExId, 0);
@@ -33,9 +35,9 @@ async function runUnitTests() {
         assert.strictEqual(statusRes1.data.is_active, 1, 'status should be 1');
         console.log('✓ Test changeExerciseStatus (1 - Active) passed.');
 
-        console.log('ALL UNIT TESTS PASSED SUCCESSFULLY!');
+        console.log('ALL EXERCISE ADMIN UNIT TESTS PASSED SUCCESSFULLY!');
     } catch (err) {
-        console.error('❌ Unit test failed:', err);
+        console.error('❌ Exercise Admin unit test failed:', err);
         process.exit(1);
     }
 }

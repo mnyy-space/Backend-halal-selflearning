@@ -1,22 +1,24 @@
 const pool = require('../libs/dp_pool');
 
-const ensureIsActiveColumnExists = async (connect) => {
+const ensureExerciseColumnsExist = async (connect) => {
     try {
         await connect.query("ALTER TABLE exercises ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1");
-    } catch (err) {
-        // Ignore error if column already exists (e.g. Duplicate column name)
-    }
+    } catch (err) {}
+    try {
+        await connect.query("ALTER TABLE exercises ADD COLUMN skill_id INT(11) NOT NULL DEFAULT 1");
+    } catch (err) {}
 };
 
-const createExercise = async (session_id, exercise_script, choices) => {
+const createExercise = async (session_id, exercise_script, choices, skill_id) => {
     let connect;
     try {
         connect = await pool.getConnection();
-        await ensureIsActiveColumnExists(connect);
+        await ensureExerciseColumnsExist(connect);
         await connect.beginTransaction();
 
-        const insertExSql = "INSERT INTO exercises (exercise_script, is_active) VALUES (?, 1)";
-        const exResult = await connect.query(insertExSql, [exercise_script]);
+        const targetSkillId = skill_id || 1;
+        const insertExSql = "INSERT INTO exercises (exercise_script, skill_id, is_active) VALUES (?, ?, 1)";
+        const exResult = await connect.query(insertExSql, [exercise_script, targetSkillId]);
         const exercise_id = Number(exResult.insertId);
 
         if (session_id) {
@@ -32,7 +34,7 @@ const createExercise = async (session_id, exercise_script, choices) => {
         }
 
         await connect.commit();
-        return { isError: false, data: { exercise_id, message: "Exercise created successfully" }, errorMessage: "" };
+        return { isError: false, data: { exercise_id, skill_id: targetSkillId, message: "Exercise created successfully" }, errorMessage: "" };
     } catch (error) {
         if (connect) await connect.rollback();
         return { isError: true, data: null, errorMessage: error.message };
@@ -41,14 +43,24 @@ const createExercise = async (session_id, exercise_script, choices) => {
     }
 };
 
-const updateExercise = async (exercise_id, exercise_script, choices) => {
+const updateExercise = async (exercise_id, exercise_script, choices, skill_id) => {
     let connect;
     try {
         connect = await pool.getConnection();
+        await ensureExerciseColumnsExist(connect);
         await connect.beginTransaction();
 
-        const updateExSql = "UPDATE exercises SET exercise_script = ?, update_date = CURRENT_TIMESTAMP WHERE exercise_id = ?";
-        await connect.query(updateExSql, [exercise_script, exercise_id]);
+        let updateExSql;
+        let updateParams;
+        if (skill_id) {
+            updateExSql = "UPDATE exercises SET exercise_script = ?, skill_id = ?, update_date = CURRENT_TIMESTAMP WHERE exercise_id = ?";
+            updateParams = [exercise_script, skill_id, exercise_id];
+        } else {
+            updateExSql = "UPDATE exercises SET exercise_script = ?, update_date = CURRENT_TIMESTAMP WHERE exercise_id = ?";
+            updateParams = [exercise_script, exercise_id];
+        }
+
+        await connect.query(updateExSql, updateParams);
 
         if (choices && Array.isArray(choices) && choices.length > 0) {
             for (const ch of choices) {
@@ -63,7 +75,7 @@ const updateExercise = async (exercise_id, exercise_script, choices) => {
         }
 
         await connect.commit();
-        return { isError: false, data: { exercise_id: Number(exercise_id), message: "Exercise updated successfully" }, errorMessage: "" };
+        return { isError: false, data: { exercise_id: Number(exercise_id), skill_id: skill_id || null, message: "Exercise updated successfully" }, errorMessage: "" };
     } catch (error) {
         if (connect) await connect.rollback();
         return { isError: true, data: null, errorMessage: error.message };
@@ -76,7 +88,7 @@ const changeExerciseStatus = async (exercise_id, is_active) => {
     let connect;
     try {
         connect = await pool.getConnection();
-        await ensureIsActiveColumnExists(connect);
+        await ensureExerciseColumnsExist(connect);
         const statusVal = (is_active === 1 || is_active === true || is_active === '1') ? 1 : 0;
         const sql = "UPDATE exercises SET is_active = ?, update_date = CURRENT_TIMESTAMP WHERE exercise_id = ?";
         const result = await connect.query(sql, [statusVal, exercise_id]);

@@ -2,11 +2,11 @@ const exerciseAdminModel = require('../../models/exercise_admin');
 
 const handleCreateExercise = async (req, res) => {
     try {
-        const { session_id, exercise_script, choices } = req.body;
+        const { session_id, exercise_script, choices, skill_id } = req.body;
         if (!exercise_script) {
             return res.status(400).json({ isError: true, data: null, errorMessage: "exercise_script is required" });
         }
-        const result = await exerciseAdminModel.createExercise(session_id, exercise_script, choices);
+        const result = await exerciseAdminModel.createExercise(session_id, exercise_script, choices, skill_id);
         res.json(result);
     } catch (error) {
         res.status(500).json({ isError: true, data: null, errorMessage: error.message });
@@ -16,11 +16,11 @@ const handleCreateExercise = async (req, res) => {
 const handleUpdateExercise = async (req, res) => {
     try {
         const { exercise_id } = req.params;
-        const { exercise_script, choices } = req.body;
+        const { exercise_script, choices, skill_id } = req.body;
         if (!exercise_id || !exercise_script) {
             return res.status(400).json({ isError: true, data: null, errorMessage: "exercise_id and exercise_script are required" });
         }
-        const result = await exerciseAdminModel.updateExercise(exercise_id, exercise_script, choices);
+        const result = await exerciseAdminModel.updateExercise(exercise_id, exercise_script, choices, skill_id);
         res.json(result);
     } catch (error) {
         res.status(500).json({ isError: true, data: null, errorMessage: error.message });

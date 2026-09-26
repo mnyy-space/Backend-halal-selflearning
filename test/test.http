@@ -48,8 +48,9 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImFmZG9sIiwiaWF0IjoxNzg0MDk2MTIxLCJleHAiOjE3ODQxODI1MjF9.Ky5e1vvde8esJD1SaaBzF9lJpSeUz_uY3S2b_lRH_Ys
 
 {
+    "skill_id": 1,
     "session_id": 1,
-    "exercise_script": "ทดสอบสร้างโจทย์ใหม่ผ่าน REST Client",
+    "exercise_script": "ทดสอบสร้างโจทย์ใหม่พร้อม skill_id ผ่าน REST Client",
     "choices": [
         { "choice_script": "ตัวเลือก 1 (ถูกต้อง)", "isAnswer": 1 },
         { "choice_script": "ตัวเลือก 2 (ไม่ถูกต้อง)", "isAnswer": 0 }
@@ -62,7 +63,8 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImFmZG9sIiwiaWF0IjoxNzg0MDk2MTIxLCJleHAiOjE3ODQxODI1MjF9.Ky5e1vvde8esJD1SaaBzF9lJpSeUz_uY3S2b_lRH_Ys
 
 {
-    "exercise_script": "ทดสอบแก้ไขโจทย์ผ่าน REST Client",
+    "skill_id": 2,
+    "exercise_script": "ทดสอบแก้ไขโจทย์พร้อม skill_id ผ่าน REST Client",
     "choices": [
         { "choice_id": 1, "choice_script": "ตัวเลือก 1 (แก้ไขแล้ว)", "isAnswer": 1 }
     ]
