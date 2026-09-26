@@ -15,6 +15,7 @@ const showSkill = require('./skills/skill')
 const handleGetSession = require('./session/session')
 const getExerciseBysessionId = require('./exercise/exercise')
 const { handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus } = require('./admin/exercise/exercise')
+const { handleGetAllSkills, handleGetSkillById, handleCreateSkill, handleUpdateSkill, handleChangeSkillStatus, handleDeleteSkill } = require('./admin/skill/skill')
 
 app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -33,6 +34,14 @@ app.get("/exercise/:session_id", authMiddleware, getExerciseBysessionId)
 app.post("/admin/exercise", authMiddleware, handleCreateExercise);
 app.put("/admin/exercise/:exercise_id", authMiddleware, handleUpdateExercise);
 app.patch("/admin/exercise/:exercise_id/status", authMiddleware, handleChangeExerciseStatus);
+
+// Admin skill endpoints
+app.get("/admin/skill", authMiddleware, handleGetAllSkills);
+app.get("/admin/skill/:skill_id", authMiddleware, handleGetSkillById);
+app.post("/admin/skill", authMiddleware, handleCreateSkill);
+app.put("/admin/skill/:skill_id", authMiddleware, handleUpdateSkill);
+app.patch("/admin/skill/:skill_id/status", authMiddleware, handleChangeSkillStatus);
+app.delete("/admin/skill/:skill_id", authMiddleware, handleDeleteSkill);
 
 app.listen(port, () => {
   console.log(`app listening on http://${host}:${port}`);
