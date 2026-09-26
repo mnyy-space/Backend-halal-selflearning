@@ -1,9 +1,18 @@
 const pool = require('../libs/dp_pool');
 
+const ensureIsActiveColumnExists = async (connect) => {
+    try {
+        await connect.query("ALTER TABLE exercises ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1");
+    } catch (err) {
+        // Ignore error if column already exists (e.g. Duplicate column name)
+    }
+};
+
 const createExercise = async (session_id, exercise_script, choices) => {
     let connect;
     try {
         connect = await pool.getConnection();
+        await ensureIsActiveColumnExists(connect);
         await connect.beginTransaction();
 
         const insertExSql = "INSERT INTO exercises (exercise_script, is_active) VALUES (?, 1)";
@@ -67,6 +76,7 @@ const changeExerciseStatus = async (exercise_id, is_active) => {
     let connect;
     try {
         connect = await pool.getConnection();
+        await ensureIsActiveColumnExists(connect);
         const statusVal = (is_active === 1 || is_active === true || is_active === '1') ? 1 : 0;
         const sql = "UPDATE exercises SET is_active = ?, update_date = CURRENT_TIMESTAMP WHERE exercise_id = ?";
         const result = await connect.query(sql, [statusVal, exercise_id]);
