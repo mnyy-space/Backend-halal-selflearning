@@ -16,6 +16,7 @@ const handleGetSession = require('./session/session')
 const getExerciseBysessionId = require('./exercise/exercise')
 const { handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus } = require('./admin/exercise/exercise')
 const { handleGetAllSkills, handleGetSkillById, handleCreateSkill, handleUpdateSkill, handleChangeSkillStatus, handleDeleteSkill } = require('./admin/skill/skill')
+const { handleGetAllGoals, handleGetGoalById, handleCreateGoal, handleUpdateGoal, handleChangeGoalStatus, handleDeleteGoal } = require('./admin/goal/goal')
 
 app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,6 +43,14 @@ app.post("/admin/skill", authMiddleware, handleCreateSkill);
 app.put("/admin/skill/:skill_id", authMiddleware, handleUpdateSkill);
 app.patch("/admin/skill/:skill_id/status", authMiddleware, handleChangeSkillStatus);
 app.delete("/admin/skill/:skill_id", authMiddleware, handleDeleteSkill);
+
+// Admin goal endpoints (Many-to-Many with Skill)
+app.get("/admin/goal", authMiddleware, handleGetAllGoals);
+app.get("/admin/goal/:goal_id", authMiddleware, handleGetGoalById);
+app.post("/admin/goal", authMiddleware, handleCreateGoal);
+app.put("/admin/goal/:goal_id", authMiddleware, handleUpdateGoal);
+app.patch("/admin/goal/:goal_id/status", authMiddleware, handleChangeGoalStatus);
+app.delete("/admin/goal/:goal_id", authMiddleware, handleDeleteGoal);
 
 app.listen(port, () => {
   console.log(`app listening on http://${host}:${port}`);
