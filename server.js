@@ -14,7 +14,7 @@ const handleRegister = require('./register/register')
 const showSkill = require('./skills/skill')
 const handleGetSession = require('./session/session')
 const getExerciseBysessionId = require('./exercise/exercise')
-const { handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus } = require('./admin/exercise/exercise')
+const { handleGetAllExercises, handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus } = require('./admin/exercise/exercise')
 const { handleGetAllSkills, handleGetSkillById, handleCreateSkill, handleUpdateSkill, handleChangeSkillStatus, handleDeleteSkill } = require('./admin/skill/skill')
 const { handleGetAllGoals, handleGetGoalById, handleCreateGoal, handleUpdateGoal, handleChangeGoalStatus, handleDeleteGoal } = require('./admin/goal/goal')
 
@@ -32,6 +32,7 @@ app.get("/session/:skill_id", authMiddleware, handleGetSession)
 app.get("/exercise/:session_id", authMiddleware, getExerciseBysessionId)
 
 // Admin exercise endpoints
+app.get("/admin/exercise", authMiddleware, handleGetAllExercises);
 app.post("/admin/exercise", authMiddleware, handleCreateExercise);
 app.put("/admin/exercise/:exercise_id", authMiddleware, handleUpdateExercise);
 app.patch("/admin/exercise/:exercise_id/status", authMiddleware, handleChangeExerciseStatus);

@@ -1,5 +1,14 @@
 const exerciseAdminModel = require('../../models/exercise_admin');
 
+const handleGetAllExercises = async (req, res) => {
+    try {
+        const result = await exerciseAdminModel.getAllExercises();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ isError: true, data: null, errorMessage: error.message });
+    }
+};
+
 const handleCreateExercise = async (req, res) => {
     try {
         const { session_id, exercise_script, choices, skill_id } = req.body;
@@ -42,6 +51,7 @@ const handleChangeExerciseStatus = async (req, res) => {
 };
 
 module.exports = {
+    handleGetAllExercises,
     handleCreateExercise,
     handleUpdateExercise,
     handleChangeExerciseStatus

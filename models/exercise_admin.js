@@ -9,6 +9,27 @@ const ensureExerciseColumnsExist = async (connect) => {
     } catch (err) {}
 };
 
+const getAllExercises = async () => {
+    let connect;
+    try {
+        connect = await pool.getConnection();
+        await ensureExerciseColumnsExist(connect);
+        const sql = "SELECT e.exercise_id, e.exercise_script, e.skill_id, s.skill_name, e.is_active, e.create_date, e.update_date FROM exercises e LEFT JOIN skills s ON e.skill_id = s.skill_id ORDER BY e.exercise_id";
+        const exercises = await connect.query(sql);
+
+        for (let i = 0; i < exercises.length; i++) {
+            const choiceSql = "SELECT choice_id, exercise_id, choice_script, isAnswer FROM exercisechoice WHERE exercise_id = ?";
+            exercises[i].choices = await connect.query(choiceSql, [exercises[i].exercise_id]);
+        }
+
+        return { isError: false, data: exercises, errorMessage: "" };
+    } catch (error) {
+        return { isError: true, data: null, errorMessage: error.message };
+    } finally {
+        if (connect) connect.release();
+    }
+};
+
 const createExercise = async (session_id, exercise_script, choices, skill_id) => {
     let connect;
     try {
@@ -105,6 +126,7 @@ const changeExerciseStatus = async (exercise_id, is_active) => {
 };
 
 module.exports = {
+    getAllExercises,
     createExercise,
     updateExercise,
     changeExerciseStatus
