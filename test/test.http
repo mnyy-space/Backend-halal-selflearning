@@ -6,6 +6,17 @@ Content-Type: application/json
 
 }
 
+#### Register
+POST http://localhost:3000/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "username" : "newuser",
+    "password" : "1234",
+    "firstName" : "New",
+    "lastName" : "User"
+}
+
 ####
 POST http://localhost:3000/authen/authen_request HTTP/1.1
 Content-Type: application/json

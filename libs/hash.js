@@ -1,8 +1,7 @@
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const crypto = require('crypto');
 
 const sha256Hash = (data) => {
-    return crypto.createHash('sha256').update(input).digest('hex');
+    return crypto.createHash('sha256').update(data).digest('hex');
 }
 
 module.exports = {

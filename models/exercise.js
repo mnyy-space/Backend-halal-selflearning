@@ -40,4 +40,5 @@ const getExerciseBySessionId = async(session_id) =>{
     }
 }
 
+
 module.exports = getExerciseBySessionId;

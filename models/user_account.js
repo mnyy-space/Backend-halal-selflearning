@@ -106,36 +106,42 @@ module.exports = {
 
     //register path
 
-    register: async (registerDTO)=>{
+    register: async (username, password, fullName) =>{
         let connect;
         let result;
         var response;
 
         try{
             connect = await pool.getConnection();
-            var sql = "INSERT INTO user_accounts(username, `password`) VALUES ( ? , ?)"
-            result = await connect.query(sql,[registerDTO.username, registerDTO.password]);
-            if(result.length == 0){
+            var sql = "INSERT INTO user_accounts(username, `password`, full_name) VALUES ( ? , ?, ?)"
+            result = await connect.query(sql,[username, password, fullName]);
+            if(result.affectedRows == 0){
                 response = {
                     isError : true,
-                    errorMessage : "data is not found"
+                    errorMessage : "register failed"
                 }
             }
             else{
                 response= {
                     isError: false,
-                    data : result
+                    data : {
+                        user_id : Number(result.insertId),
+                        username,
+                        full_name : fullName,
+                    }
                 }
             }
         }
         catch(error){
             response = {
                 isError: true,
-                errorMessage: error.message
+                errorMessage: error.code === 'ER_DUP_ENTRY' ? "username นี้ถูกใช้งานแล้ว" : error.message
             }
-        }   
+        }
         finally{
-            connect.release()
+            if(connect){
+                connect.release();
+            }
             return response;
         }
     }
