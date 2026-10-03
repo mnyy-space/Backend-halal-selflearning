@@ -6,8 +6,8 @@ const getExerciseBySessionId = async(session_id) =>{
     var response;
     try{
         connect = await pool.getConnection();
-        // ดึงข้อมูล exercise โดย join กับตาราง sessionandexercise เพื่อหาตาม session_id
-        var sql = "SELECT e.exercise_id, e.exercise_script FROM exercises e JOIN sessionandexercise se ON e.exercise_id = se.exercise_id WHERE se.session_id = ?";
+        // ดึงข้อมูล exercise โดย join กับตาราง sessionsWithExercise เพื่อหาตาม session_id
+        var sql = "SELECT e.exercise_id, e.exercise_script FROM exercises e JOIN sessionsWithExercise swe ON e.exercise_id = swe.exercise_id WHERE swe.session_id = ? AND swe.is_active = 1 AND e.is_active = 1";
         result = await connect.query(sql, [session_id]);
         if(result.length == 0){
             response = {
@@ -16,9 +16,9 @@ const getExerciseBySessionId = async(session_id) =>{
             }
         }
         else{
-            // ดึงข้อมูล choice ของแต่ละ exercise จากตาราง exercisechoice
+            // ดึงข้อมูล choice ของแต่ละ exercise จากตาราง choices
             for(let i = 0; i < result.length; i++){
-                var choiceSql = "SELECT choice_id, exercise_id, choice_script, isAnswer FROM exercisechoice WHERE exercise_id = ?";
+                var choiceSql = "SELECT choice_id, exercise_id, choice_script, isAnswer FROM choices WHERE exercise_id = ?";
                 var choiceResult = await connect.query(choiceSql, [result[i].exercise_id]);
                 result[i].choices = choiceResult;
             }

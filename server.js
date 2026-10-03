@@ -17,6 +17,7 @@ const getExerciseBysessionId = require('./exercise/exercise')
 const { handleGetAllExercises, handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus } = require('./admin/exercise/exercise')
 const { handleGetAllSkills, handleGetSkillById, handleCreateSkill, handleUpdateSkill, handleChangeSkillStatus, handleDeleteSkill } = require('./admin/skill/skill')
 const { handleGetAllGoals, handleGetGoalById, handleCreateGoal, handleUpdateGoal, handleChangeGoalStatus, handleDeleteGoal } = require('./admin/goal/goal')
+const { handleGetAllSessions, handleCreateSession, handleUpdateSession, handleDeleteSession } = require('./admin/session/session')
 
 app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -52,6 +53,12 @@ app.post("/admin/goal", authMiddleware, handleCreateGoal);
 app.put("/admin/goal/:goal_id", authMiddleware, handleUpdateGoal);
 app.patch("/admin/goal/:goal_id/status", authMiddleware, handleChangeGoalStatus);
 app.delete("/admin/goal/:goal_id", authMiddleware, handleDeleteGoal);
+
+// Admin session endpoints
+app.get("/admin/session", authMiddleware, handleGetAllSessions);
+app.post("/admin/session", authMiddleware, handleCreateSession);
+app.put("/admin/session/:session_id", authMiddleware, handleUpdateSession);
+app.delete("/admin/session/:session_id", authMiddleware, handleDeleteSession);
 
 app.listen(port, () => {
   console.log(`app listening on http://${host}:${port}`);

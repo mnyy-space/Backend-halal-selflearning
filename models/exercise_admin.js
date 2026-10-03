@@ -18,7 +18,7 @@ const getAllExercises = async () => {
         const exercises = await connect.query(sql);
 
         for (let i = 0; i < exercises.length; i++) {
-            const choiceSql = "SELECT choice_id, exercise_id, choice_script, isAnswer FROM exercisechoice WHERE exercise_id = ?";
+            const choiceSql = "SELECT choice_id, exercise_id, choice_script, isAnswer FROM choices WHERE exercise_id = ?";
             exercises[i].choices = await connect.query(choiceSql, [exercises[i].exercise_id]);
         }
 
@@ -43,13 +43,13 @@ const createExercise = async (session_id, exercise_script, choices, skill_id) =>
         const exercise_id = Number(exResult.insertId);
 
         if (session_id) {
-            const insertRelSql = "INSERT INTO sessionandexercise (session_id, exercise_id) VALUES (?, ?)";
+            const insertRelSql = "INSERT INTO sessionsWithExercise (session_id, exercise_id) VALUES (?, ?)";
             await connect.query(insertRelSql, [session_id, exercise_id]);
         }
 
         if (choices && Array.isArray(choices) && choices.length > 0) {
             for (const ch of choices) {
-                const insertChoiceSql = "INSERT INTO exercisechoice (exercise_id, choice_script, isAnswer) VALUES (?, ?, ?)";
+                const insertChoiceSql = "INSERT INTO choices (exercise_id, choice_script, isAnswer) VALUES (?, ?, ?)";
                 await connect.query(insertChoiceSql, [exercise_id, ch.choice_script, ch.isAnswer ? 1 : 0]);
             }
         }
@@ -86,10 +86,10 @@ const updateExercise = async (exercise_id, exercise_script, choices, skill_id) =
         if (choices && Array.isArray(choices) && choices.length > 0) {
             for (const ch of choices) {
                 if (ch.choice_id) {
-                    const updateChSql = "UPDATE exercisechoice SET choice_script = ?, isAnswer = ?, update_date = CURRENT_TIMESTAMP WHERE choice_id = ? AND exercise_id = ?";
+                    const updateChSql = "UPDATE choices SET choice_script = ?, isAnswer = ?, update_date = CURRENT_TIMESTAMP WHERE choice_id = ? AND exercise_id = ?";
                     await connect.query(updateChSql, [ch.choice_script, ch.isAnswer ? 1 : 0, ch.choice_id, exercise_id]);
                 } else {
-                    const insertChSql = "INSERT INTO exercisechoice (exercise_id, choice_script, isAnswer) VALUES (?, ?, ?)";
+                    const insertChSql = "INSERT INTO choices (exercise_id, choice_script, isAnswer) VALUES (?, ?, ?)";
                     await connect.query(insertChSql, [exercise_id, ch.choice_script, ch.isAnswer ? 1 : 0]);
                 }
             }
