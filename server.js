@@ -18,6 +18,7 @@ const { handleGetAllExercises, handleCreateExercise, handleUpdateExercise, handl
 const { handleGetAllSkills, handleGetSkillById, handleCreateSkill, handleUpdateSkill, handleChangeSkillStatus, handleDeleteSkill } = require('./admin/skill/skill')
 const { handleGetAllGoals, handleGetGoalById, handleCreateGoal, handleUpdateGoal, handleChangeGoalStatus, handleDeleteGoal } = require('./admin/goal/goal')
 const { handleGetAllSessions, handleCreateSession, handleUpdateSession, handleDeleteSession } = require('./admin/session/session')
+const { handleGetAllUsers, handleGetUserById, handleCreateUser, handleUpdateUser, handleDeleteUser } = require('./admin/user/user')
 
 app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -60,6 +61,13 @@ app.get("/admin/session", authMiddleware, handleGetAllSessions);
 app.post("/admin/session", authMiddleware, handleCreateSession);
 app.put("/admin/session/:session_id", authMiddleware, handleUpdateSession);
 app.delete("/admin/session/:session_id", authMiddleware, handleDeleteSession);
+
+// Admin user endpoints
+app.get("/admin/user", authMiddleware, handleGetAllUsers);
+app.get("/admin/user/:user_id", authMiddleware, handleGetUserById);
+app.post("/admin/user", authMiddleware, handleCreateUser);
+app.put("/admin/user/:user_id", authMiddleware, handleUpdateUser);
+app.delete("/admin/user/:user_id", authMiddleware, handleDeleteUser);
 
 app.listen(port, () => {
   console.log(`app listening on http://${host}:${port}`);
