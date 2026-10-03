@@ -59,6 +59,12 @@ const handleAccessRequest = async (req, res) => {
             const user_id = result.data[0].user_id
             const username = result.data[0].username
             const role_name = result.data[0].role_name
+
+        // ตรวจสอบประวัติล่าสุด 1 แถวเพื่อดูว่าเคยเรียน/ทำแบบฝึกหัดแล้วหรือยัง
+        const historyResult = await userAccountModel.getLatestHistory(user_id);
+        const latestHistory = (!historyResult.isError && historyResult.data) ? historyResult.data : null;
+        const hasHistory = latestHistory !== null;
+
         var payload = {
             user_id,
             username,
@@ -71,6 +77,8 @@ const handleAccessRequest = async (req, res) => {
               user_id,
               username,
               role_name,
+              has_history: hasHistory,
+              latest_history: latestHistory,
               accessToken},
             errorMessage: ""
         }
@@ -87,8 +95,17 @@ const handleAccessRequest = async (req, res) => {
   res.send(JSON.stringify(response))
 };
 
+const handleGetLatestHistory = async (req, res) => {
+  const user_id = req.user?.user_id;
+  if (!user_id) {
+    return res.status(401).json({ isError: true, errorMessage: "Unauthorized", data: null });
+  }
+  const result = await userAccountModel.getLatestHistory(user_id);
+  res.json(result);
+};
 
 module.exports = {
   handleAuthenRequest,
   handleAccessRequest,
+  handleGetLatestHistory,
 };

@@ -144,6 +144,55 @@ module.exports = {
             }
             return response;
         }
+    },
+
+    getLatestHistory: async (userId) => {
+        let connect;
+        let response;
+        try {
+            connect = await pool.getConnection();
+            const sql = `
+                SELECT 
+                    h.history_id,
+                    h.user_id,
+                    h.create_date AS history_date,
+                    swe.session_id,
+                    s.session_name,
+                    s.skill_id,
+                    sk.skill_name,
+                    sk.skill_code
+                FROM history h
+                JOIN sessionswithexercise swe ON h.session_with_exercise_id = swe.session_with_exercise_id
+                JOIN \`sessions\` s ON swe.session_id = s.session_id
+                JOIN skills sk ON s.skill_id = sk.skill_id
+                WHERE h.user_id = ?
+                ORDER BY h.create_date DESC, h.history_id DESC
+                LIMIT 1
+            `;
+            const result = await connect.query(sql, [userId]);
+            if (result.length === 0) {
+                response = {
+                    isError: false,
+                    data: null
+                };
+            } else {
+                response = {
+                    isError: false,
+                    data: result[0]
+                };
+            }
+        } catch (error) {
+            response = {
+                isError: true,
+                errorMessage: error.message,
+                data: null
+            };
+        } finally {
+            if (connect) {
+                connect.release();
+            }
+            return response;
+        }
     }
 
 }

@@ -9,7 +9,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const { authMiddleware } = require("./middleware/auth_middleware")
 
-const { handleAuthenRequest, handleAccessRequest } = require("./auth/auth");
+const { handleAuthenRequest, handleAccessRequest, handleGetLatestHistory } = require("./auth/auth");
 const handleRegister = require('./register/register')
 const showSkill = require('./skills/skill')
 const handleGetSession = require('./session/session')
@@ -28,6 +28,7 @@ app.use(cors());
 app.post("/authen/authen_request", handleAuthenRequest);
 app.post("/authen/access_request", handleAccessRequest);
 app.post("/register", handleRegister)
+app.get("/user/latest-history", authMiddleware, handleGetLatestHistory)
 app.get("/skill", authMiddleware, showSkill)
 app.get("/session/:skill_id", authMiddleware, handleGetSession)
 app.get("/exercise/:session_id", authMiddleware, getExerciseBysessionId)
