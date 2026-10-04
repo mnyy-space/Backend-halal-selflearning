@@ -83,7 +83,30 @@ const updateExercise = async (exercise_id, exercise_script, choices, skill_id) =
 
         await connect.query(updateExSql, updateParams);
 
-        if (choices && Array.isArray(choices) && choices.length > 0) {
+        if (Array.isArray(choices)) {
+            const retainedChoiceIds = [...new Set(
+                choices
+                    .map((choice) => Number(choice.choice_id))
+                    .filter((choiceId) => Number.isInteger(choiceId) && choiceId > 0)
+            )];
+
+            if (retainedChoiceIds.length > 0) {
+                const placeholders = retainedChoiceIds.map(() => '?').join(', ');
+                const ownedChoices = await connect.query(
+                    `SELECT choice_id FROM choices WHERE exercise_id = ? AND choice_id IN (${placeholders})`,
+                    [exercise_id, ...retainedChoiceIds]
+                );
+                if (ownedChoices.length !== retainedChoiceIds.length) {
+                    throw new Error('A choice does not belong to this exercise');
+                }
+                await connect.query(
+                    `DELETE FROM choices WHERE exercise_id = ? AND choice_id NOT IN (${placeholders})`,
+                    [exercise_id, ...retainedChoiceIds]
+                );
+            } else {
+                await connect.query('DELETE FROM choices WHERE exercise_id = ?', [exercise_id]);
+            }
+
             for (const ch of choices) {
                 if (ch.choice_id) {
                     const updateChSql = "UPDATE choices SET choice_script = ?, isAnswer = ?, update_date = CURRENT_TIMESTAMP WHERE choice_id = ? AND exercise_id = ?";
