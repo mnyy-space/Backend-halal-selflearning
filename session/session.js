@@ -6,7 +6,7 @@ const handleGetSession = async (req, res) =>{
     if(result.isError){
         res.json({
             isError : true,
-            data: "",
+            data: [],
             errorMessage : result.errorMessage
         })
     }

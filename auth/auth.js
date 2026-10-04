@@ -104,8 +104,18 @@ const handleGetLatestHistory = async (req, res) => {
   res.json(result);
 };
 
+const handleGetAllHistory = async (req, res) => {
+  const user_id = req.user?.user_id;
+  if (!user_id) {
+    return res.status(401).json({ isError: true, errorMessage: "Unauthorized", data: [] });
+  }
+  const result = await userAccountModel.getAllHistory(user_id);
+  res.json(result);
+};
+
 module.exports = {
   handleAuthenRequest,
   handleAccessRequest,
   handleGetLatestHistory,
+  handleGetAllHistory,
 };

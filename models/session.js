@@ -6,11 +6,12 @@ const showSession = async(skill_id)=>{
     var response;
     try{
         connect = await pool.getConnection();
-        var sql = "SELECT session_id,session_name FROM sessions where skill_id = ?"
+        var sql = "SELECT session_id, session_name FROM sessions WHERE skill_id = ? AND is_active = 1"
         result = await connect.query(sql,[skill_id]);
         if(result.length == 0){
             response = {
-                isError : true,
+                isError : false,
+                data : [],
                 errorMessage : "data is not found"
             }
         }

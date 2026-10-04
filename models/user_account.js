@@ -193,6 +193,46 @@ module.exports = {
             }
             return response;
         }
-    }
+    },
 
+    getAllHistory: async (userId) => {
+        let connect;
+        let response;
+        try {
+            connect = await pool.getConnection();
+            const sql = `
+                SELECT 
+                    h.history_id,
+                    h.user_id,
+                    h.create_date AS history_date,
+                    swe.session_id,
+                    s.session_name,
+                    s.skill_id,
+                    sk.skill_name,
+                    sk.skill_code
+                FROM history h
+                JOIN sessionswithexercise swe ON h.session_with_exercise_id = swe.session_with_exercise_id
+                JOIN \`sessions\` s ON swe.session_id = s.session_id
+                JOIN skills sk ON s.skill_id = sk.skill_id
+                WHERE h.user_id = ?
+                ORDER BY h.create_date DESC, h.history_id DESC
+            `;
+            const result = await connect.query(sql, [userId]);
+            response = {
+                isError: false,
+                data: result || []
+            };
+        } catch (error) {
+            response = {
+                isError: true,
+                errorMessage: error.message,
+                data: []
+            };
+        } finally {
+            if (connect) {
+                connect.release();
+            }
+            return response;
+        }
+    }
 }

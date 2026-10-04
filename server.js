@@ -9,11 +9,11 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const { authMiddleware } = require("./middleware/auth_middleware")
 
-const { handleAuthenRequest, handleAccessRequest, handleGetLatestHistory } = require("./auth/auth");
+const { handleAuthenRequest, handleAccessRequest, handleGetLatestHistory, handleGetAllHistory } = require("./auth/auth");
 const handleRegister = require('./register/register')
 const showSkill = require('./skills/skill')
 const handleGetSession = require('./session/session')
-const getExerciseBysessionId = require('./exercise/exercise')
+const { getExerciseBysessionId, handleRecordExerciseHistory } = require('./exercise/exercise')
 const { handleGetAllExercises, handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus } = require('./admin/exercise/exercise')
 const { handleGetAllSkills, handleGetSkillById, handleCreateSkill, handleUpdateSkill, handleChangeSkillStatus, handleDeleteSkill } = require('./admin/skill/skill')
 const { handleGetAllGoals, handleGetGoalById, handleCreateGoal, handleUpdateGoal, handleChangeGoalStatus, handleDeleteGoal } = require('./admin/goal/goal')
@@ -29,9 +29,11 @@ app.post("/authen/authen_request", handleAuthenRequest);
 app.post("/authen/access_request", handleAccessRequest);
 app.post("/register", handleRegister)
 app.get("/user/latest-history", authMiddleware, handleGetLatestHistory)
+app.get("/user/history", authMiddleware, handleGetAllHistory)
 app.get("/skill", authMiddleware, showSkill)
 app.get("/session/:skill_id", authMiddleware, handleGetSession)
 app.get("/exercise/:session_id", authMiddleware, getExerciseBysessionId)
+app.post("/exercise/history", authMiddleware, handleRecordExerciseHistory)
 
 // Admin exercise endpoints
 app.get("/admin/exercise", authMiddleware, handleGetAllExercises);
