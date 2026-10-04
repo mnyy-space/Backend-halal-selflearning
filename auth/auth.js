@@ -62,6 +62,7 @@ const handleAccessRequest = async (req, res) => {
         var payload = {
             user_id,
             username,
+            role_name,
         }
 
         const accessToken = jwt.sign(payload);

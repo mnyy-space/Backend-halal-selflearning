@@ -7,7 +7,7 @@ const host = "localhost";
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const { authMiddleware } = require("./middleware/auth_middleware")
+const { authMiddleware, requireRole } = require("./middleware/auth_middleware")
 
 const { handleAuthenRequest, handleAccessRequest } = require("./auth/auth");
 const handleRegister = require('./register/register')
@@ -31,6 +31,9 @@ app.post("/register", handleRegister)
 app.get("/skill", authMiddleware, showSkill)
 app.get("/session/:skill_id", authMiddleware, handleGetSession)
 app.get("/exercise/:session_id", authMiddleware, getExerciseBysessionId)
+
+// ทุก endpoint ที่ขึ้นต้นด้วย /admin ต้อง login และมี role เป็น admin
+app.use("/admin", authMiddleware, requireRole("admin"));
 
 // Admin exercise endpoints
 app.get("/admin/exercise", authMiddleware, handleGetAllExercises);
