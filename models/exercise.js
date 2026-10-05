@@ -56,7 +56,7 @@ const getExerciseBySessionId = async (session_id) => {
     }
 };
 
-const recordExerciseHistory = async (userId, sessionWithExerciseId, sessionId) => {
+const recordExerciseHistory = async (userId, sessionWithExerciseId, sessionId, score = null, totalQuestions = null) => {
     let connect;
     let response;
     try {
@@ -79,14 +79,16 @@ const recordExerciseHistory = async (userId, sessionWithExerciseId, sessionId) =
             };
         }
 
-        const insertSql = "INSERT INTO history (session_with_exercise_id, user_id) VALUES (?, ?)";
-        const insertResult = await connect.query(insertSql, [sweId, userId]);
+        const insertSql = "INSERT INTO history (session_with_exercise_id, user_id, score, total_questions) VALUES (?, ?, ?, ?)";
+        const insertResult = await connect.query(insertSql, [sweId, userId, score, totalQuestions]);
         response = {
             isError: false,
             data: {
                 history_id: Number(insertResult.insertId),
                 session_with_exercise_id: sweId,
-                user_id: userId
+                user_id: userId,
+                score: score,
+                total_questions: totalQuestions
             }
         };
     } catch (error) {
