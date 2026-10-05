@@ -58,6 +58,7 @@ const handleAccessRequest = async (req, res) => {
     else{
             const user_id = result.data[0].user_id
             const username = result.data[0].username
+            const full_name = result.data[0].full_name || ''
             const role_name = result.data[0].role_name
 
         // ตรวจสอบประวัติล่าสุด 1 แถวเพื่อดูว่าเคยเรียน/ทำแบบฝึกหัดแล้วหรือยัง
@@ -77,6 +78,7 @@ const handleAccessRequest = async (req, res) => {
             data : {
               user_id,
               username,
+              full_name,
               role_name,
               has_history: hasHistory,
               latest_history: latestHistory,
@@ -114,9 +116,34 @@ const handleGetAllHistory = async (req, res) => {
   res.json(result);
 };
 
+const handleGetProfile = async (req, res) => {
+  const user_id = req.user?.user_id;
+  if (!user_id) {
+    return res.status(401).json({ isError: true, errorMessage: "Unauthorized", data: null });
+  }
+  const result = await userAccountModel.getProfile(user_id);
+  res.json(result);
+};
+
+const handleUpdateProfile = async (req, res) => {
+  const user_id = req.user?.user_id;
+  if (!user_id) {
+    return res.status(401).json({ isError: true, errorMessage: "Unauthorized", data: null });
+  }
+  const { full_name, password } = req.body;
+  const result = await userAccountModel.updateProfile(
+    user_id,
+    full_name ? full_name.trim() : '',
+    password
+  );
+  res.json(result);
+};
+
 module.exports = {
   handleAuthenRequest,
   handleAccessRequest,
   handleGetLatestHistory,
   handleGetAllHistory,
+  handleGetProfile,
+  handleUpdateProfile,
 };

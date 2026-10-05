@@ -67,7 +67,7 @@ module.exports = {
         try{
             connect = await pool.getConnection();
             // sql needed
-            var sql = "SELECT uc.user_id, uc.username, ur.role_name "
+            var sql = "SELECT uc.user_id, uc.username, uc.full_name, ur.role_name "
             + "FROM user_accounts uc "
             + "JOIN user_role ur ON uc.role_id = ur.role_id "
             + "WHERE SHA2(CONCAT(uc.username, '&', uc.password, '&', ?), 256) = ?"
@@ -238,6 +238,94 @@ module.exports = {
             if (connect) {
                 connect.release();
             }
+            return response;
+        }
+    },
+
+    getProfile: async (userId) => {
+        let connect;
+        let response;
+        try {
+            connect = await pool.getConnection();
+            const sql = `
+                SELECT 
+                    uc.user_id,
+                    uc.username,
+                    uc.full_name,
+                    uc.role_id,
+                    COALESCE(ur.role_name, 'user') AS role_name,
+                    DATE_FORMAT(uc.create_date, '%Y-%m-%d %H:%i:%s') AS create_date
+                FROM user_accounts uc
+                LEFT JOIN user_role ur ON uc.role_id = ur.role_id
+                WHERE uc.user_id = ?
+            `;
+            const result = await connect.query(sql, [userId]);
+            if (result.length === 0) {
+                response = {
+                    isError: true,
+                    data: null,
+                    errorMessage: "User not found"
+                };
+            } else {
+                response = {
+                    isError: false,
+                    data: result[0],
+                    errorMessage: ""
+                };
+            }
+        } catch (error) {
+            response = {
+                isError: true,
+                data: null,
+                errorMessage: error.message
+            };
+        } finally {
+            if (connect) connect.release();
+            return response;
+        }
+    },
+
+    updateProfile: async (userId, fullName, password) => {
+        let connect;
+        let response;
+        try {
+            connect = await pool.getConnection();
+            let sql;
+            let params;
+            if (password && password.trim() !== '') {
+                const crypto = require('crypto');
+                const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+                sql = `
+                    UPDATE user_accounts 
+                    SET full_name = ?, password = ?
+                    WHERE user_id = ?
+                `;
+                params = [fullName, passwordHash, userId];
+            } else {
+                sql = `
+                    UPDATE user_accounts 
+                    SET full_name = ?
+                    WHERE user_id = ?
+                `;
+                params = [fullName, userId];
+            }
+            await connect.query(sql, params);
+            response = {
+                isError: false,
+                data: {
+                    user_id: userId,
+                    full_name: fullName
+                },
+                errorMessage: ""
+            };
+        } catch (error) {
+            response = {
+                isError: true,
+                data: null,
+                errorMessage: error.message
+            };
+        } finally {
+            if (connect) connect.release();
             return response;
         }
     }
