@@ -16,7 +16,6 @@ const handleGetSession = require('./session/session')
 const { getExerciseBysessionId, handleRecordExerciseHistory } = require('./exercise/exercise')
 const { handleGetAllExercises, handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus } = require('./admin/exercise/exercise')
 const { handleGetAllSkills, handleGetSkillById, handleCreateSkill, handleUpdateSkill, handleChangeSkillStatus, handleDeleteSkill } = require('./admin/skill/skill')
-const { handleGetAllGoals, handleGetGoalById, handleCreateGoal, handleUpdateGoal, handleChangeGoalStatus, handleDeleteGoal } = require('./admin/goal/goal')
 const { handleGetAllSessions, handleCreateSession, handleUpdateSession, handleDeleteSession } = require('./admin/session/session')
 const { handleGetAllUsers, handleGetUserById, handleCreateUser, handleUpdateUser, handleDeleteUser } = require('./admin/user/user')
 
@@ -52,14 +51,6 @@ app.post("/admin/skill", authMiddleware, handleCreateSkill);
 app.put("/admin/skill/:skill_id", authMiddleware, handleUpdateSkill);
 app.patch("/admin/skill/:skill_id/status", authMiddleware, handleChangeSkillStatus);
 app.delete("/admin/skill/:skill_id", authMiddleware, handleDeleteSkill);
-
-// Admin goal endpoints (Many-to-Many with Skill)
-app.get("/admin/goal", authMiddleware, handleGetAllGoals);
-app.get("/admin/goal/:goal_id", authMiddleware, handleGetGoalById);
-app.post("/admin/goal", authMiddleware, handleCreateGoal);
-app.put("/admin/goal/:goal_id", authMiddleware, handleUpdateGoal);
-app.patch("/admin/goal/:goal_id/status", authMiddleware, handleChangeGoalStatus);
-app.delete("/admin/goal/:goal_id", authMiddleware, handleDeleteGoal);
 
 // Admin session endpoints
 app.get("/admin/session", authMiddleware, handleGetAllSessions);
