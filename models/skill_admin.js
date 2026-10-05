@@ -1,11 +1,17 @@
 const pool = require('../libs/dp_pool');
 
+// ชื่อไอคอน Material (Flutter Icons.xxx) ที่ใช้เมื่อไม่ได้เลือกไอคอน
+const DEFAULT_SKILL_ICON = 'school';
+
 const ensureSkillColumnsExist = async (connect) => {
     try {
         await connect.query("ALTER TABLE skills ADD COLUMN skill_code VARCHAR(50) DEFAULT NULL");
     } catch (err) {}
     try {
         await connect.query("ALTER TABLE skills ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1");
+    } catch (err) {}
+    try {
+        await connect.query("ALTER TABLE skills ADD COLUMN skill_icon VARCHAR(50) NOT NULL DEFAULT 'school' AFTER skill_name");
     } catch (err) {}
 };
 
@@ -14,7 +20,7 @@ const getAllSkills = async () => {
     try {
         connect = await pool.getConnection();
         await ensureSkillColumnsExist(connect);
-        const sql = "SELECT skill_id, skill_code, skill_name, is_active, create_date, update_date FROM skills";
+        const sql = "SELECT skill_id, skill_code, skill_name, skill_icon, is_active, create_date, update_date FROM skills";
         const result = await connect.query(sql);
         return { isError: false, data: result, errorMessage: "" };
     } catch (error) {
@@ -29,7 +35,7 @@ const getSkillById = async (skill_id) => {
     try {
         connect = await pool.getConnection();
         await ensureSkillColumnsExist(connect);
-        const sql = "SELECT skill_id, skill_code, skill_name, is_active, create_date, update_date FROM skills WHERE skill_id = ?";
+        const sql = "SELECT skill_id, skill_code, skill_name, skill_icon, is_active, create_date, update_date FROM skills WHERE skill_id = ?";
         const result = await connect.query(sql, [skill_id]);
         if (result.length === 0) {
             return { isError: true, data: null, errorMessage: "Skill not found" };
@@ -42,14 +48,14 @@ const getSkillById = async (skill_id) => {
     }
 };
 
-const createSkill = async (skill_code, skill_name, is_active = 1) => {
+const createSkill = async (skill_code, skill_name, is_active = 1, skill_icon) => {
     let connect;
     try {
         connect = await pool.getConnection();
         await ensureSkillColumnsExist(connect);
         const statusVal = (is_active === 1 || is_active === true || is_active === '1') ? 1 : 0;
-        const sql = "INSERT INTO skills (skill_code, skill_name, is_active, create_date, update_date) VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-        const result = await connect.query(sql, [skill_code || null, skill_name, statusVal]);
+        const sql = "INSERT INTO skills (skill_code, skill_name, skill_icon, is_active, create_date, update_date) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+        const result = await connect.query(sql, [skill_code || null, skill_name, skill_icon || DEFAULT_SKILL_ICON, statusVal]);
         return {
             isError: false,
             data: { skill_id: Number(result.insertId), message: "Skill created successfully" },
@@ -62,14 +68,14 @@ const createSkill = async (skill_code, skill_name, is_active = 1) => {
     }
 };
 
-const updateSkill = async (skill_id, skill_code, skill_name, is_active) => {
+const updateSkill = async (skill_id, skill_code, skill_name, is_active, skill_icon) => {
     let connect;
     try {
         connect = await pool.getConnection();
         await ensureSkillColumnsExist(connect);
         const statusVal = (is_active === undefined || is_active === null) ? 1 : ((is_active === 1 || is_active === true || is_active === '1') ? 1 : 0);
-        const sql = "UPDATE skills SET skill_code = ?, skill_name = ?, is_active = ?, update_date = CURRENT_TIMESTAMP WHERE skill_id = ?";
-        const result = await connect.query(sql, [skill_code || null, skill_name, statusVal, skill_id]);
+        const sql = "UPDATE skills SET skill_code = ?, skill_name = ?, skill_icon = ?, is_active = ?, update_date = CURRENT_TIMESTAMP WHERE skill_id = ?";
+        const result = await connect.query(sql, [skill_code || null, skill_name, skill_icon || DEFAULT_SKILL_ICON, statusVal, skill_id]);
         if (result.affectedRows === 0) {
             return { isError: true, data: null, errorMessage: "Skill not found" };
         }

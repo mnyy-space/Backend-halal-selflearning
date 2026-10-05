@@ -6,7 +6,7 @@ const showSkill = async () =>{
     var response;
     try{
         connect = await pool.getConnection();
-        var sql = "SELECT skill_id, skill_name, skill_code FROM skills WHERE is_active = 1"
+        var sql = "SELECT skill_id, skill_name, skill_code, skill_icon FROM skills WHERE is_active = 1"
         result = await connect.query(sql);
         if(result.length == 0){
             response = {

@@ -160,7 +160,8 @@ module.exports = {
                     s.session_name,
                     s.skill_id,
                     sk.skill_name,
-                    sk.skill_code
+                    sk.skill_code,
+                    sk.skill_icon
                 FROM history h
                 JOIN sessionswithexercise swe ON h.session_with_exercise_id = swe.session_with_exercise_id
                 JOIN \`sessions\` s ON swe.session_id = s.session_id
@@ -209,7 +210,8 @@ module.exports = {
                     s.session_name,
                     s.skill_id,
                     sk.skill_name,
-                    sk.skill_code
+                    sk.skill_code,
+                    sk.skill_icon
                 FROM history h
                 JOIN sessionswithexercise swe ON h.session_with_exercise_id = swe.session_with_exercise_id
                 JOIN \`sessions\` s ON swe.session_id = s.session_id

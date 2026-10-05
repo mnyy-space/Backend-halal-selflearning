@@ -16,7 +16,8 @@ const getExerciseBySessionId = async (session_id) => {
                 swe.session_with_exercise_id,
                 swe.session_id,
                 s.session_name,
-                sk.skill_name
+                sk.skill_name,
+                sk.skill_icon
             FROM exercises e 
             JOIN sessionswithexercise swe ON e.exercise_id = swe.exercise_id 
             JOIN \`sessions\` s ON swe.session_id = s.session_id
