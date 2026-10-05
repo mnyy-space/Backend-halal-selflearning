@@ -6,8 +6,20 @@ const showSkill = async () =>{
     var response;
     try{
         connect = await pool.getConnection();
-        var sql = "SELECT skill_id, skill_name, skill_code, skill_icon FROM skills WHERE is_active = 1"
+        // session_count นับเงื่อนไขเดียวกับ GET /session/:skill_id (เฉพาะที่เปิดใช้งาน)
+        var sql = `
+            SELECT
+                sk.skill_id, sk.skill_name, sk.skill_code, sk.skill_icon,
+                (
+                    SELECT COUNT(*) FROM sessions s
+                    WHERE s.skill_id = sk.skill_id AND s.is_active = 1
+                ) AS session_count
+            FROM skills sk
+            WHERE sk.is_active = 1
+        `
         result = await connect.query(sql);
+        // COUNT(*) ได้ค่าเป็น BigInt จาก driver mariadb ซึ่ง res.json แปลงไม่ได้ จึงแปลงเป็น Number
+        result = result.map(row => ({ ...row, session_count: Number(row.session_count) }));
         if(result.length == 0){
             response = {
                 isError : true,
