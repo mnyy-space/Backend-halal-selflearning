@@ -148,9 +148,33 @@ const changeExerciseStatus = async (exercise_id, is_active) => {
     }
 };
 
+const deleteExercise = async (exercise_id) => {
+    let connect;
+    try {
+        connect = await pool.getConnection();
+        await connect.beginTransaction();
+        await connect.query(
+            'DELETE h FROM history h JOIN sessionsWithExercise swe ON h.session_with_exercise_id = swe.session_with_exercise_id WHERE swe.exercise_id = ?',
+            [exercise_id]
+        );
+        await connect.query('DELETE FROM sessionsWithExercise WHERE exercise_id = ?', [exercise_id]);
+        await connect.query('DELETE FROM choices WHERE exercise_id = ?', [exercise_id]);
+        const result = await connect.query('DELETE FROM exercises WHERE exercise_id = ?', [exercise_id]);
+        if (result.affectedRows === 0) throw new Error('Exercise not found');
+        await connect.commit();
+        return { isError: false, data: { exercise_id: Number(exercise_id), message: "Exercise deleted successfully" }, errorMessage: "" };
+    } catch (error) {
+        if (connect) await connect.rollback();
+        return { isError: true, data: null, errorMessage: error.message };
+    } finally {
+        if (connect) connect.release();
+    }
+};
+
 module.exports = {
     getAllExercises,
     createExercise,
     updateExercise,
-    changeExerciseStatus
+    changeExerciseStatus,
+    deleteExercise
 };
