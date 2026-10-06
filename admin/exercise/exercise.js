@@ -50,9 +50,18 @@ const handleChangeExerciseStatus = async (req, res) => {
     }
 };
 
+const handleDeleteExercise = async (req, res) => {
+    try {
+        res.json(await exerciseAdminModel.deleteExercise(req.params.exercise_id));
+    } catch (error) {
+        res.status(500).json({ isError: true, data: null, errorMessage: error.message });
+    }
+};
+
 module.exports = {
     handleGetAllExercises,
     handleCreateExercise,
     handleUpdateExercise,
-    handleChangeExerciseStatus
+    handleChangeExerciseStatus,
+    handleDeleteExercise
 };
