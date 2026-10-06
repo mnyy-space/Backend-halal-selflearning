@@ -20,8 +20,30 @@ const getAllSkills = async () => {
     try {
         connect = await pool.getConnection();
         await ensureSkillColumnsExist(connect);
-        const sql = "SELECT skill_id, skill_code, skill_name, skill_icon, is_active, create_date, update_date FROM skills";
-        const result = await connect.query(sql);
+        const sql = `
+            SELECT 
+                s.skill_id, 
+                s.skill_code, 
+                s.skill_name, 
+                s.skill_icon, 
+                s.is_active, 
+                s.create_date, 
+                s.update_date,
+                (
+                    SELECT COUNT(DISTINCT e.exercise_id)
+                    FROM exercises e
+                    LEFT JOIN sessionswithexercise swe ON swe.exercise_id = e.exercise_id
+                    LEFT JOIN sessions sess ON sess.session_id = swe.session_id
+                    WHERE e.skill_id = s.skill_id OR sess.skill_id = s.skill_id
+                ) AS exercise_count
+            FROM skills s
+            ORDER BY s.skill_id ASC
+        `;
+        let result = await connect.query(sql);
+        result = result.map(row => ({
+            ...row,
+            exercise_count: Number(row.exercise_count || 0)
+        }));
         return { isError: false, data: result, errorMessage: "" };
     } catch (error) {
         return { isError: true, data: null, errorMessage: error.message };
@@ -35,12 +57,34 @@ const getSkillById = async (skill_id) => {
     try {
         connect = await pool.getConnection();
         await ensureSkillColumnsExist(connect);
-        const sql = "SELECT skill_id, skill_code, skill_name, skill_icon, is_active, create_date, update_date FROM skills WHERE skill_id = ?";
+        const sql = `
+            SELECT 
+                s.skill_id, 
+                s.skill_code, 
+                s.skill_name, 
+                s.skill_icon, 
+                s.is_active, 
+                s.create_date, 
+                s.update_date,
+                (
+                    SELECT COUNT(DISTINCT e.exercise_id)
+                    FROM exercises e
+                    LEFT JOIN sessionswithexercise swe ON swe.exercise_id = e.exercise_id
+                    LEFT JOIN sessions sess ON sess.session_id = swe.session_id
+                    WHERE e.skill_id = s.skill_id OR sess.skill_id = s.skill_id
+                ) AS exercise_count
+            FROM skills s
+            WHERE s.skill_id = ?
+        `;
         const result = await connect.query(sql, [skill_id]);
         if (result.length === 0) {
             return { isError: true, data: null, errorMessage: "Skill not found" };
         }
-        return { isError: false, data: result[0], errorMessage: "" };
+        const data = {
+            ...result[0],
+            exercise_count: Number(result[0].exercise_count || 0)
+        };
+        return { isError: false, data, errorMessage: "" };
     } catch (error) {
         return { isError: true, data: null, errorMessage: error.message };
     } finally {
