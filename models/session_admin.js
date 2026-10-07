@@ -20,11 +20,13 @@ const validateExercises = async (connect, skillId, exerciseIds) => {
     return uniqueIds;
 };
 
+// ปิดใช้งาน link เดิมแทนการลบ เพราะ history อ้างถึง sessionsWithExercise (ON DELETE CASCADE)
+// ถ้าลบทิ้ง ประวัติการทำ session ของผู้ใช้จะหายไปด้วย
 const replaceExerciseLinks = async (connect, sessionId, exerciseIds) => {
-    await connect.query('DELETE FROM sessionsWithExercise WHERE session_id = ?', [sessionId]);
+    await connect.query('UPDATE sessionsWithExercise SET is_active = 0 WHERE session_id = ?', [sessionId]);
     for (const exerciseId of exerciseIds) {
         await connect.query(
-            'INSERT INTO sessionsWithExercise (session_id, exercise_id) VALUES (?, ?)',
+            'INSERT INTO sessionsWithExercise (session_id, exercise_id, is_active) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_active = 1',
             [sessionId, exerciseId]
         );
     }
@@ -115,4 +117,54 @@ const deleteSession = async (sessionId) => {
     }
 };
 
-module.exports = { getAllSessions, createSession, updateSession, deleteSession };
+// log การทำ session ของผู้ใช้ทุกคน (1 แถว = 1 รอบที่ทำ) พร้อมจำนวนข้อถูก/ผิดของแต่ละรอบ
+const getSessionHistory = async (sessionId) => {
+    let connect;
+    try {
+        connect = await pool.getConnection();
+        const rows = await connect.query(
+            `SELECT h.history_id, h.user_id, u.username, u.full_name, h.score, h.total_questions,
+                    DATE_FORMAT(h.create_date, '%Y-%m-%d %H:%i:%s') AS create_date
+             FROM history h
+             JOIN sessionsWithExercise swe ON swe.session_with_exercise_id = h.session_with_exercise_id
+             JOIN user_accounts u ON u.user_id = h.user_id
+             WHERE swe.session_id = ?
+             ORDER BY h.create_date ASC, h.history_id ASC`,
+            [sessionId]
+        );
+        // นับลำดับรอบของผู้ใช้แต่ละคน (ครั้งที่ 1, 2, ...) แล้วเรียงล่าสุดขึ้นก่อน
+        const attemptsByUser = {};
+        const logs = rows.map((row) => {
+            const userId = Number(row.user_id);
+            attemptsByUser[userId] = (attemptsByUser[userId] || 0) + 1;
+            const hasScore = row.score !== null && row.total_questions !== null;
+            return {
+                history_id: Number(row.history_id),
+                user_id: userId,
+                username: row.username,
+                full_name: row.full_name,
+                attempt_no: attemptsByUser[userId],
+                correct_count: hasScore ? Number(row.score) : null,
+                incorrect_count: hasScore ? Number(row.total_questions) - Number(row.score) : null,
+                total_questions: hasScore ? Number(row.total_questions) : null,
+                create_date: row.create_date,
+            };
+        }).reverse();
+        return {
+            isError: false,
+            data: {
+                session_id: Number(sessionId),
+                attempt_count: logs.length,
+                user_count: Object.keys(attemptsByUser).length,
+                logs,
+            },
+            errorMessage: '',
+        };
+    } catch (error) {
+        return { isError: true, data: null, errorMessage: error.message };
+    } finally {
+        if (connect) connect.release();
+    }
+};
+
+module.exports = { getAllSessions, createSession, updateSession, deleteSession, getSessionHistory };

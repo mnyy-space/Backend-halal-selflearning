@@ -16,7 +16,7 @@ const handleGetSession = require('./session/session')
 const { getExerciseBysessionId, handleRecordExerciseHistory } = require('./exercise/exercise')
 const { handleGetAllExercises, handleCreateExercise, handleUpdateExercise, handleChangeExerciseStatus, handleDeleteExercise } = require('./admin/exercise/exercise')
 const { handleGetAllSkills, handleGetSkillById, handleCreateSkill, handleUpdateSkill, handleChangeSkillStatus, handleDeleteSkill } = require('./admin/skill/skill')
-const { handleGetAllSessions, handleCreateSession, handleUpdateSession, handleDeleteSession } = require('./admin/session/session')
+const { handleGetAllSessions, handleGetSessionHistory, handleCreateSession, handleUpdateSession, handleDeleteSession } = require('./admin/session/session')
 const { handleGetAllUsers, handleGetUserById, handleCreateUser, handleUpdateUser, handleDeleteUser } = require('./admin/user/user')
 
 app = express();
@@ -60,6 +60,7 @@ app.get("/admin/session", authMiddleware, handleGetAllSessions);
 app.post("/admin/session", authMiddleware, handleCreateSession);
 app.put("/admin/session/:session_id", authMiddleware, handleUpdateSession);
 app.delete("/admin/session/:session_id", authMiddleware, handleDeleteSession);
+app.get("/admin/session/:session_id/history", authMiddleware, handleGetSessionHistory);
 
 // Admin user endpoints
 app.get("/admin/user", authMiddleware, handleGetAllUsers);

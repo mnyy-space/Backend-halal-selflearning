@@ -41,8 +41,17 @@ const handleDeleteSession = async (req, res) => {
     }
 };
 
+const handleGetSessionHistory = async (req, res) => {
+    try {
+        res.json(await sessionAdminModel.getSessionHistory(req.params.session_id));
+    } catch (error) {
+        res.status(500).json({ isError: true, data: null, errorMessage: error.message });
+    }
+};
+
 module.exports = {
     handleGetAllSessions,
+    handleGetSessionHistory,
     handleCreateSession,
     handleUpdateSession,
     handleDeleteSession,
